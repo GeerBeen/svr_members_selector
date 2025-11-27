@@ -12,6 +12,7 @@ from DB.init_db.database import create_db_and_tables
 DATA_DIR = Path(__file__).resolve().parent
 from DB.init_db.database import engine
 
+
 def create_default_admin():
     with Session(engine) as session:
         if session.exec(select(User).where(User.username == "admin")).first():
@@ -25,11 +26,6 @@ def create_default_admin():
 def get_session():
     with Session(engine) as session:
         yield session
-
-
-def create_db_and_tables():
-    SQLModel.metadata.create_all(engine)
-    print("База створена або вже існує")
 
 
 def load_json(file_path: str):
@@ -209,4 +205,3 @@ def init_db_on_first_start():
     create_default_admin()
     insert_values()
     print("Перший запуск завершено!")
-
