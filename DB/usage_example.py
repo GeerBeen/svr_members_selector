@@ -1,8 +1,9 @@
-from models import Candidate, Keyword, User
 from sqlmodel import Session, select
 from icecream import ic
-from DB.create_database import engine
-
+from DB.models import (
+    Institution, Specialty, Candidate, Keyword, CandidateKeyword, User
+)
+from DB.init_db.database import engine
 
 def main():
     search_term = "оптимізація"

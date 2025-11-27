@@ -5,9 +5,21 @@ from pydantic import BaseModel
 from DB.pydantic_models import RegisterPayload, LoginPayload
 from DB.models import User
 from DB.auth import hash_password, verify_password, generate_token
-from DB.create_database import engine
+from DB.init_db.init_db import engine
+import uvicorn
 
-app = FastAPI()
+from DB.init_db.init_db import init_db_on_first_start
+
+from contextlib import asynccontextmanager
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db_on_first_start()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 
 @app.post("/register")
@@ -39,3 +51,11 @@ def login(payload: LoginPayload):
         session.commit()
 
         return {"token": new_token}
+
+
+def main():
+    uvicorn.run(app)
+
+
+if __name__ == '__main__':
+    main()

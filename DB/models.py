@@ -1,4 +1,4 @@
-from sqlmodel import SQLModel, Field, create_engine, Relationship, Session
+from sqlmodel import SQLModel, Field,  Relationship
 from typing import Optional, List
 from sqlalchemy import UniqueConstraint
 from datetime import datetime
