@@ -1,6 +1,7 @@
-from models import Candidate, engine, Keyword
+from models import Candidate, Keyword, User
 from sqlmodel import Session, select
 from icecream import ic
+from DB.create_database import engine
 
 
 def main():
@@ -14,5 +15,14 @@ def main():
         ic(kw, len(kw))
 
 
+def show_users():
+    with Session(engine) as s:
+        statement = select(User)
+        res = s.exec(statement).all()
+
+        ic(res)
+
+
 if __name__ == '__main__':
     main()
+    show_users()

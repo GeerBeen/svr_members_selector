@@ -1,8 +1,7 @@
-from sqlmodel import SQLModel, Field, create_engine, Relationship
+from sqlmodel import SQLModel, Field, create_engine, Relationship, Session
 from typing import Optional, List
 from sqlalchemy import UniqueConstraint
-
-engine = create_engine("sqlite:///defense.db", echo=False, future=True)
+from datetime import datetime
 
 
 class Institution(SQLModel, table=True):
@@ -58,10 +57,10 @@ class Candidate(SQLModel, table=True):
     )
 
 
-def create_db():
-    SQLModel.metadata.create_all(engine)
-    print("created")
-
-
-if __name__ == "__main__":
-    create_db()
+class User(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    username: str = Field(index=True, unique=True)
+    hashed_password: str
+    is_admin: bool = Field(default=False)
+    remember_token: Optional[str] = Field(default=None, index=True)
+    last_login_at: Optional[datetime] = None
