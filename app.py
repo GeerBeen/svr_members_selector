@@ -6,6 +6,9 @@ from DB.pydantic_models import RegisterPayload, LoginPayload
 from DB.models import User
 from DB.auth import hash_password, verify_password, generate_token
 from DB.init_db.init_db import engine
+from backend.pydantic_models import CouncilPayload
+from backend.profile import Profile
+from backend.algorithm import form_council
 import uvicorn
 
 from DB.init_db.init_db import init_db_on_first_start
@@ -51,6 +54,28 @@ def login(payload: LoginPayload):
         session.commit()
 
         return {"token": new_token}
+    
+
+@app.post('/get-council')
+def get_council(payload: CouncilPayload):
+    
+    app_profile = Profile(
+        orcid=payload.orcid,
+        specialty=payload.specialty_id, 
+        keywords=payload.keywords
+    )
+
+    try:
+        council = form_council(app_profile, payload.amount, key=payload.key)
+        res_list = [cand.orcid for cand in council]
+        return {"orcid_list": res_list}
+    
+    except Exception as e:
+        print(f"Помилка під час обробки запиту: {e}")
+        raise HTTPException(
+            status_code=500, 
+            detail={"error": "Внутрішня помилка сервера.", "details": str(e)}
+        )
 
 
 def main():

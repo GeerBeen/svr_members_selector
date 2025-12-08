@@ -1,6 +1,7 @@
 from sqlmodel import Session, select
 from DB import models
-from . import profile
+from DB.init_db.init_db import engine
+from backend import profile
 
 # конвертує models.Candidate в profile.Profile
 def to_profile(cand: models.Candidate):
@@ -22,7 +23,7 @@ def weight(keyword):
 
 # повертає кандидата з вказаним orcid
 def get_cand(cand_id):
-    with Session(models.engine) as session:
+    with Session(engine) as session:
         
         statement = select(models.Candidate).where(models.Candidate.orcid == cand_id)
         cand = session.exec(statement).first()
@@ -43,7 +44,7 @@ def get_app():
 def get_all_cands():
     cands = set()
 
-    with Session(models.engine) as session:
+    with Session(engine) as session:
         statement = select(models.Candidate)
         candidate_db = session.exec(statement).all()
 
@@ -60,7 +61,7 @@ def get_all_cands():
 def get_cands_by_specialty(specialty_id):
     cands = set()
 
-    with Session(models.engine) as session:
+    with Session(engine) as session:
         # отримання кандлидатів із заданим specialty_id
         candidate_statement = select(models.Candidate).where(
             models.Candidate.degree_spec_id == specialty_id

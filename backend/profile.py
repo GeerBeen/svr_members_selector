@@ -1,4 +1,4 @@
-from . import dbfuncs
+from backend import dbfuncs
 
 class Profile:
 

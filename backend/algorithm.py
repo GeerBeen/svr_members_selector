@@ -1,4 +1,4 @@
-from . import dbfuncs
+from backend import dbfuncs
 
 # app_profile - профіль заявки
 # amount - кількість кандидатів
