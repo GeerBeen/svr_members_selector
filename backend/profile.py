@@ -7,6 +7,7 @@ class Profile:
         self.specialty_id = specialty_id
         self.keywords = keywords
         self.suitability = 0
+        self.weights = {}
 
     def __eq__(self, other):
         if not isinstance(other, Profile):
@@ -27,13 +28,15 @@ class Profile:
     def display(self):
         print(self.__repr__())
 
+    def set_weights(self):
+        self.weights = dbfuncs.get_weights(self.keywords)
+
     #usage: application.compare(candidate)
     def compare(self, candidate):
         candidate.suitability = 0
 
-        for keyword_app in self.keywords: 
-            for keyword_cand in candidate.keywords: 
-                if keyword_cand == keyword_app:
-                    candidate.suitability += dbfuncs.weight(keyword_cand)
-                    break # переходимо до наступного keyword_app
+        for keyword_app in self.keywords:
+            if keyword_app in candidate.keywords:
+                weight_value = self.weights.get(keyword_app, 0.0)
+                candidate.suitability += weight_value
 

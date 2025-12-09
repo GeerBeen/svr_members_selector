@@ -17,6 +17,7 @@ def form_council(app_profile, amount, key=0):
     else:
         candidates.update( dbfuncs.get_all_cands() )
 
+    app_profile.set_weights() # встановлюємо вагу ключових слів
     for cand in candidates:
         app_profile.compare(cand)
 

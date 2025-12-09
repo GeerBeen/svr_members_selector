@@ -1,7 +1,8 @@
-from sqlmodel import Session, select
+from sqlmodel import Session, select, func
 from DB import models
 from DB.init_db.init_db import engine
 from backend import profile
+from typing import List, Dict
 
 # конвертує models.Candidate в profile.Profile
 def to_profile(cand: models.Candidate):
@@ -16,9 +17,32 @@ def to_profile(cand: models.Candidate):
         keywords=keyword_list
     )
 
-# повертає вагу ключового слова
-def weight(keyword):
-    return 1
+# повертає словник з вагою для ключових слів
+def get_weights(keywords: List[str]) -> Dict[str, float]:
+    weights: Dict[str, float] = {}
+    
+    # ініціалізація високою вагою (1.0) для всіх слів 
+    # це гарантує, що слова, не знайдені в БД, матимуть високу вагу
+    for word in keywords:
+        weights[word] = 1.0
+
+    with Session(engine) as session:
+        statement = (
+            select(
+                models.Keyword.word,
+                func.count(models.CandidateKeyword.candidate_orcid).label("frequency")
+            )
+            .join(models.CandidateKeyword) 
+            .where(models.Keyword.word.in_(keywords)) 
+            .group_by(models.Keyword.word) 
+        )
+        results = session.exec(statement).all()
+        
+        # обробка результатів:
+        for word, frequency in results:
+            if frequency > 0:
+                weights[word] = 1.0 / frequency            
+    return weights 
 
 
 # повертає кандидата з вказаним orcid
@@ -49,7 +73,7 @@ def get_all_cands():
         candidate_db = session.exec(statement).all()
 
         for candidate in candidate_db:
-            # Використовуємо приватний конвертер
+            # використовуємо приватний конвертер
             new_cand = to_profile(candidate) 
             if new_cand:
                 cands.add(new_cand)
